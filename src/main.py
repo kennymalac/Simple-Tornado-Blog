@@ -19,7 +19,7 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers, **settings)
 
 
-class Page(RequestHandler):
+class Page(tornado.web.RequestHandler):
     """Base class for pages."""
     def fail(self, message):
         """Send error message to be displayed."""
