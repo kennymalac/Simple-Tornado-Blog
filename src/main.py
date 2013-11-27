@@ -9,14 +9,8 @@ import tornado.options
 import tornado.web
 from tornado.options import define, options
 
+current_dir = os.path.dirname(__file__)
 define("port", default=8888, help="run server on given port", type=int)
-
-class Application(tornado.web.Application):
-    """Base tornado web class for our application."""
-    def __init__(self):
-        handlers = []
-        settings = dict()
-        tornado.web.Application.__init__(self, handlers, **settings)
 
 
 class Page(tornado.web.RequestHandler):
@@ -26,10 +20,29 @@ class Page(tornado.web.RequestHandler):
         self.write(message)
 
 
+class IndexPage(Page):
+    def get(self):
+        self.render("index.html")
+
+
 def main():
-    """Start our web application."""
+    """Create and start our web application."""
     tornado.options.parse_command_line()
-    http_server = tornado.httpserver.HTTPServer(Application())
+    join = os.path.join
+
+    settings = dict(
+        template_path=join(current_dir, "templates"),
+        static_path=join(current_dir, "static"),
+        debug=True,
+    )
+
+    handlers = [
+        (r"/", IndexPage),
+    ]
+
+    application = tornado.web.Application(handlers, **settings)
+
+    http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
 
