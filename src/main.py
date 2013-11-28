@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os.path
 
+import pymongo
 import tornado.auth
 import tornado.escape
 import tornado.httpserver
@@ -9,8 +10,11 @@ import tornado.options
 import tornado.web
 from tornado.options import define, options
 
-current_dir = os.path.dirname(__file__)
 define("port", default=8888, help="run server on given port", type=int)
+
+current_dir = os.path.dirname(__file__)
+client = pymongo.MongoClient()
+db = client['tornado-blog']
 
 
 class Page(tornado.web.RequestHandler):
