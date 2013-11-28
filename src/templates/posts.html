@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block body %}
+	{% for post in posts %}
+		{% include "one_post.html" %}
+	{% end %}
+{% end %}
