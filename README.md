@@ -2,6 +2,6 @@
 
 This is a simple blogging software built using Python and the Tornado web server.
 
-## Requirements
-pymongo
-tornado
+## Requirements  
+pymongo  
+tornado  
