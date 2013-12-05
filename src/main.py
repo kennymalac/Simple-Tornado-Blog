@@ -29,6 +29,13 @@ class IndexPage(Page):
         self.render("index.html")
 
 
+class PostPage(Page):
+    def get(self, slug):
+        entry = db.posts.find_one({"slug": slug})
+        if not entry: raise tornado.web.HTTPError(404)
+        self.render("post.html", post=entry)
+
+
 class PostsPage(Page):
     def compile_posts(self, page_num):
         pagination = 10
@@ -57,6 +64,7 @@ def main():
     handlers = [
         (r"/", IndexPage),
         (r"/posts", PostsPage),
+        (r"/post/([^/]+)", PostPage),
     ]
 
     application = tornado.web.Application(handlers, **settings)
