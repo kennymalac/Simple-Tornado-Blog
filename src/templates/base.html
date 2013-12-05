@@ -2,11 +2,26 @@
 <html>
 	<head>
 	{% block head %}
+	<title>{% block title %}Blog{% end %}</title>
 	{% end %}
 	</head>
 
 	<body>
-	{% block body %}
-	{% end %}
+		<header>
+			<nav>
+				<ul>
+					<li><a href="/">Home</a></li>
+					<li><a href="/posts">Posts</a></li>
+					{# <li><a href=""></a></li> #}
+				</ul>
+			</nav>
+		</header>
+
+		{% block body %}
+		{% end %}
+
+		<footer>
+			Copyright 2013
+		</footer>
 	</body>
 </html>
