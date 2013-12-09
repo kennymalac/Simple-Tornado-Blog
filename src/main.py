@@ -25,11 +25,13 @@ class Page(tornado.web.RequestHandler):
 
 
 class IndexPage(Page):
+    """Homepage of the website."""
     def get(self):
         self.render("index.html")
 
 
 class PostPage(Page):
+    """A post shown individually."""
     def get(self, slug):
         entry = db.posts.find_one({"slug": slug})
         if not entry: raise tornado.web.HTTPError(404)
@@ -37,6 +39,7 @@ class PostPage(Page):
 
 
 class PostsPage(Page):
+    """List of all of our posts."""
     def compile_posts(self, page_num):
         pagination = 10
         db.posts.ensure_index("timestamp", -1)
@@ -50,6 +53,10 @@ class PostsPage(Page):
         )
 
 
+class AdminPage(Page):
+    """Index for our admin panel."""
+
+    
 def main():
     """Create and start our web application."""
     tornado.options.parse_command_line()
