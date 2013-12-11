@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os.path
+from os import urandom
 
 import pymongo
 import tornado.auth
@@ -8,6 +9,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+from tornado.web import (authenticated)
 from tornado.options import define, options
 
 define("port", default=8888, help="run server on given port", type=int)
@@ -55,6 +57,9 @@ class PostsPage(Page):
 
 class AdminPage(Page):
     """Index for our admin panel."""
+    @authenticated
+    def get(self):
+        self.render("admin.html")
 
     
 def main():
@@ -63,8 +68,11 @@ def main():
     join = os.path.join
 
     settings = dict(
+        cookie_secret=urandom(64),
+        xsrf_cookies=True,
         template_path=join(current_dir, "templates"),
         static_path=join(current_dir, "static"),
+        login_url="/admin/login",
         debug=True,
     )
 
@@ -72,6 +80,7 @@ def main():
         (r"/", IndexPage),
         (r"/posts", PostsPage),
         (r"/post/([^/]+)", PostPage),
+        (r"/admin", AdminPage),
     ]
 
     application = tornado.web.Application(handlers, **settings)
