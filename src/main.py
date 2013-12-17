@@ -95,6 +95,27 @@ class AdminPage(Page):
     def get(self):
         self.render("admin.html")
 
+
+class NewPostPage(Page):
+    """Page for creating new posts."""
+    @authenticated
+    def post(self):
+        pass
+
+    @authenticated
+    def get(self):
+        self.render("newpost.html")
+
+
+class NewUserPage(Page):
+    """Page for creating new users."""
+    @authenticated
+    def post(self):
+        pass
+
+    def get(self):
+        self.render("newuser.html")
+
     
 def main():
     """Create and start our web application."""
@@ -116,6 +137,8 @@ def main():
         (r"/post/([^/]+)", PostPage),
         (r"/admin", AdminPage),
         (r"/admin/login", AdminLoginPage),
+        (r"/admin/newpost", NewPostPage),
+        (r"/admin/newuser", NewUserPage),
     ]
 
     application = tornado.web.Application(handlers, **settings)
