@@ -57,6 +57,16 @@ class PostsPage(Page):
 
 class AdminLoginPage(Page):
     """Logs in the the admin into the control panel."""
+    def post(self):
+        username = self.get_argument("login")
+        password = self.get_argument("password")
+
+        if username and password:
+            print("success")
+        else:
+            self.fail("A username or password was not supplied.")
+            self.get()
+        
     def get(self):
         self.render("login.html")
 
