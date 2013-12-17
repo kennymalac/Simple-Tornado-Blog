@@ -55,6 +55,12 @@ class PostsPage(Page):
         )
 
 
+class AdminLoginPage(Page):
+    """Logs in the the admin into the control panel."""
+    def get(self):
+        self.render("login.html")
+
+    
 class AdminPage(Page):
     """Index for our admin panel."""
     @authenticated
@@ -81,6 +87,7 @@ def main():
         (r"/posts", PostsPage),
         (r"/post/([^/]+)", PostPage),
         (r"/admin", AdminPage),
+        (r"/admin/login", AdminLoginPage),
     ]
 
     application = tornado.web.Application(handlers, **settings)
