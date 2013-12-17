@@ -2,7 +2,6 @@
 import os.path
 from os import urandom
 
-import pymongo
 import tornado.auth
 import tornado.escape
 import tornado.httpserver
@@ -12,15 +11,23 @@ import tornado.web
 from tornado.web import (authenticated)
 from tornado.options import define, options
 
+import pymongo
+from passlib.context import CryptContext
+
 define("port", default=8888, help="run server on given port", type=int)
 
 current_dir = os.path.dirname(__file__)
 client = pymongo.MongoClient()
 db = client["tornado-blog"]
+cryptctx = CryptContext(schemes=["sha256_crypt"])
 
 
 class Page(tornado.web.RequestHandler):
     """Base class for pages."""
+    def get_current_user(self):
+        """Enables authentication by overriding tornado default."""
+        return self.get_secure_cookie("username")
+    
     def fail(self, message):
         """Send error message to be displayed."""
         self.write(message)
@@ -62,11 +69,22 @@ class AdminLoginPage(Page):
         password = self.get_argument("password")
 
         if username and password:
-            print("success")
+            exists = db.users.find_one({"username": username})
+
+            if exists:
+                hash1 = exists["password"]
+                
+                if cryptctx.verify(password, hash1):
+                    print("success")
+                    self.set_secure_cookie("username", username)
+                    self.redirect("/admin")
+                else:
+                    self.fail("Password is incorrect.")
+            else:
+                self.fail("User does not exist.")
         else:
             self.fail("A username or password was not supplied.")
-            self.get()
-        
+
     def get(self):
         self.render("login.html")
 
