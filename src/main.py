@@ -155,6 +155,7 @@ class NewUserPage(Page):
         else:
             self.fail("Please provide both a username and password.")
 
+    @authenticated
     def get(self):
         self.render("newuser.html")
 
