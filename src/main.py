@@ -137,7 +137,23 @@ class NewUserPage(Page):
     """Page for creating new users."""
     @authenticated
     def post(self):
-        pass
+        login = self.get_argument("login")
+        password = self.get_argument("password")
+
+        #will return nothing if doesn't exist already
+        exists = db.users.find_one({"username": login})
+
+        if login and password:
+            if not exists:
+                db.users.insert(dict(
+                    username=login,
+                    password=cryptctx.encrypt(password),
+                ))
+                self.redirect("/admin")
+            else:
+                self.fail("Login with that username already exists!")
+        else:
+            self.fail("Please provide both a username and password.")
 
     def get(self):
         self.render("newuser.html")
