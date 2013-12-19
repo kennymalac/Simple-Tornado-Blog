@@ -11,6 +11,8 @@ import tornado.web
 from tornado.web import (authenticated)
 from tornado.options import define, options
 
+import re
+from datetime import datetime
 import pymongo
 from passlib.context import CryptContext
 
@@ -20,6 +22,12 @@ current_dir = os.path.dirname(__file__)
 client = pymongo.MongoClient()
 db = client["tornado-blog"]
 cryptctx = CryptContext(schemes=["sha256_crypt"])
+
+
+def slugify(title):
+    # remove non-alphanumeric characters
+    abc = re.sub(r'\W+', '-', title)
+    return abc.lower()
 
 
 class Page(tornado.web.RequestHandler):
@@ -75,7 +83,6 @@ class AdminLoginPage(Page):
                 hash1 = exists["password"]
                 
                 if cryptctx.verify(password, hash1):
-                    print("success")
                     self.set_secure_cookie("username", username)
                     self.redirect("/admin")
                 else:
@@ -100,7 +107,26 @@ class NewPostPage(Page):
     """Page for creating new posts."""
     @authenticated
     def post(self):
-        pass
+        ga = self.get_argument
+        title = ga("title")
+        tags = ga("tags")
+        body = ga("content")
+
+        if title and tags and body:
+            slug = slugify(title)
+            
+            db.posts.insert(dict(
+                title=title,
+                author=self.get_current_user(),
+                slug=slug,
+                timestamp=datetime.now(),
+                body=body,
+                tags=tags.split(","),
+            ))
+            self.redirect("/post/" + slug)
+        else:
+            self.fail("You did not provide all fields!")
+        
 
     @authenticated
     def get(self):
